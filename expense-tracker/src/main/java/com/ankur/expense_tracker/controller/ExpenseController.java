@@ -1,23 +1,32 @@
 package com.ankur.expense_tracker.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import com.ankur.expense_tracker.model.Expense;
+import com.ankur.expense_tracker.service.ExpenseService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import com.ankur.expense_tracker.entity.Expense;
 
+import java.time.LocalDate;
 import java.util.List;
 
 
 @RestController
-@RequestMapping("/expenses")
+@RequestMapping("/api/expenses")
 public class ExpenseController {
 
+    @Autowired
+    private ExpenseService expenseService;
+
     @GetMapping
-    public List<Expense> getAllExpenses() {
-        return List.of(
-                new Expense(1L, "Lunch", 150.0),
-                new Expense(2L, "Transport", 80.0)
-        );
+    public ResponseEntity<List<Expense>> getAllExpenses() {
+        return new ResponseEntity<>(expenseService.getAllExpenses(),HttpStatus.OK);
     }
+
+    @PostMapping
+    public ResponseEntity<Expense> addExpense(@RequestBody Expense expense){
+       return new ResponseEntity<>(expenseService.saveExpense(expense), HttpStatus.CREATED);
+    }
+
 
 }

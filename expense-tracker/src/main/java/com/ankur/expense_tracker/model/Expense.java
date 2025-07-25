@@ -7,5 +7,6 @@ import lombok.Data;
 public class Expense {
     private Long id;
     private String description;
-    private Double amount;
+    private Double amountGiven;
+    private Double amountTaken;
 }
