@@ -2,6 +2,8 @@ package com.ankur.expense_tracker.service;
 
 import com.ankur.expense_tracker.dto.ExpenseDTO;
 import com.ankur.expense_tracker.entity.Expense;
+import com.ankur.expense_tracker.exception.ResourceNotFoundException;
+import com.ankur.expense_tracker.exception.TitleNotFoundExcepton;
 import com.ankur.expense_tracker.mapper.ExpenseMapper;
 import com.ankur.expense_tracker.repository.ExpenseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -29,12 +32,17 @@ public class ExpenseService {
     }
 
     public Expense getExpenseById(Long id) {
-        return  expenseRepository.findById(id).orElseThrow(()-> new RuntimeException("Resource Not found Exception"));
+        return  expenseRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Resource Not found Exception"));
     }
 
     public List<ExpenseDTO> getExpensesByTitleName(String title) {
-        return expenseRepository.findByTitle(title).stream().map(ExpenseMapper::toDtO).collect(Collectors.toList());
+        List<Expense> expenses = expenseRepository.findByTitle(title);
+        if (expenses.isEmpty()) {
+            throw new TitleNotFoundExcepton("Title '" + title + "' not found in the system");
+        }
+        return expenses.stream().map(ExpenseMapper::toDtO).collect(Collectors.toList());
     }
+
 
 
     public List<ExpenseDTO> getExpensesByAmount(Double amount) {
