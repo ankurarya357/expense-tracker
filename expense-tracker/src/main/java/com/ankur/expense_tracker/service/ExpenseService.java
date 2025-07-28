@@ -1,10 +1,12 @@
 package com.ankur.expense_tracker.service;
 
 import com.ankur.expense_tracker.dto.ExpenseDTO;
+import com.ankur.expense_tracker.entity.Category;
 import com.ankur.expense_tracker.entity.Expense;
 import com.ankur.expense_tracker.exception.ResourceNotFoundException;
 import com.ankur.expense_tracker.exception.TitleNotFoundExcepton;
 import com.ankur.expense_tracker.mapper.ExpenseMapper;
+import com.ankur.expense_tracker.repository.CategoryRepository;
 import com.ankur.expense_tracker.repository.ExpenseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,13 +24,28 @@ public class ExpenseService {
     @Autowired
     private ExpenseRepository expenseRepository;
 
-    public Expense saveExpense(Expense expense) {
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    public ExpenseService(ExpenseRepository expenseRepository, CategoryRepository categoryRepository) {
+        this.expenseRepository = expenseRepository;
+        this.categoryRepository = categoryRepository;
+    }
+
+    public Expense saveExpense(ExpenseDTO expenseDTO) {
+        Category category = categoryRepository.findByName(expenseDTO.getCategoryName())
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with Name: " + expenseDTO.getCategoryName()));
+        Expense expense = ExpenseMapper.toEntity(expenseDTO,category);
         return expenseRepository.save(expense);
     }
 
     public List<ExpenseDTO> getAllExpenses() {
         List<Expense> expenses =  expenseRepository.findAll();
         return expenses.stream().map(expense -> ExpenseMapper.toDtO(expense)).collect(Collectors.toList());
+    }
+
+    public List<Expense> getExpensesByCategoryName(String categoryName) {
+        return expenseRepository.findByCategoryName(categoryName);
     }
 
     public Expense getExpenseById(Long id) {

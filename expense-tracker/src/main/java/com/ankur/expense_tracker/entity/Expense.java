@@ -3,6 +3,7 @@ package com.ankur.expense_tracker.entity;
 import javax.persistence.*;
 import java.time.LocalDate;
 
+import com.ankur.expense_tracker.service.CategoryService;
 import lombok.*;
 
 @Data
@@ -22,4 +23,8 @@ public class Expense {
     private double amount;
 
     private LocalDate date;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="category_id",nullable = false)
+    private Category category;
 }

@@ -8,6 +8,8 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -29,5 +31,8 @@ public class Category {
     @CreationTimestamp
     @Column(name = "created_at",updatable = false, nullable = false)
     private LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "category",cascade = CascadeType.ALL)
+    private List<Expense> expense = new ArrayList<>();
 
 }

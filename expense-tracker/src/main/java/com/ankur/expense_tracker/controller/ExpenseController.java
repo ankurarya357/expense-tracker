@@ -1,8 +1,10 @@
 package com.ankur.expense_tracker.controller;
 
 import com.ankur.expense_tracker.dto.ExpenseDTO;
+import com.ankur.expense_tracker.entity.Category;
 import com.ankur.expense_tracker.mapper.ExpenseMapper;
 import com.ankur.expense_tracker.response.BaseResponse;
+import com.ankur.expense_tracker.service.CategoryServiceImp;
 import com.ankur.expense_tracker.service.ExpenseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +15,7 @@ import com.ankur.expense_tracker.entity.Expense;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -21,6 +24,9 @@ public class ExpenseController {
 
     @Autowired
     private ExpenseService expenseService;
+
+    @Autowired
+    private CategoryServiceImp categoryService;
 
     @GetMapping("/title/{title}")
     public ResponseEntity<BaseResponse<List<ExpenseDTO>>> getExpenseByTitle(@PathVariable String title){
@@ -37,6 +43,15 @@ public class ExpenseController {
         return new ResponseEntity<>(new BaseResponse<>(true,"All expenses fetched",expenseService.getAllExpenses()),HttpStatus.OK);
     }
 
+    @GetMapping("/by-category")
+    public ResponseEntity<BaseResponse<List<ExpenseDTO>>> getExpensesByCategoryName(@RequestParam String categoryName) {
+        List<Expense> expenses = expenseService.getExpensesByCategoryName(categoryName);
+        List<ExpenseDTO> dtos = expenses.stream()
+                .map(ExpenseMapper::toDtO)
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(new BaseResponse<>(true, "Expenses by category", dtos), HttpStatus.OK);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<BaseResponse<ExpenseDTO>> getExpenseById(@PathVariable Long id) {
         Expense expense = expenseService.getExpenseById(id);
@@ -46,7 +61,7 @@ public class ExpenseController {
 
     @PostMapping
     public ResponseEntity<BaseResponse<ExpenseDTO>> addExpense(@RequestBody ExpenseDTO expenseDTO){
-        Expense savedExpense = expenseService.saveExpense(ExpenseMapper.toEntity(expenseDTO));
+        Expense savedExpense = expenseService.saveExpense(expenseDTO);
         return new ResponseEntity<>(new BaseResponse<>(true,"Data Saved Successfully",ExpenseMapper.toDtO(savedExpense)), HttpStatus.CREATED);
     }
 
@@ -59,7 +74,7 @@ public class ExpenseController {
 
     @PutMapping("/{id}")
     public ResponseEntity<BaseResponse<ExpenseDTO>> updateExpense(@PathVariable Long id,@RequestBody ExpenseDTO expenseDTO){
-        Expense expense = expenseService.updateExpense(id,ExpenseMapper.toEntity(expenseDTO));
+        Expense expense = expenseService.updateExpense(id,ExpenseMapper.toEntity(expenseDTO,null));
         return new ResponseEntity<>( new BaseResponse<>(true,"Data updated",ExpenseMapper.toDtO(expense)),HttpStatus.OK);
     }
 

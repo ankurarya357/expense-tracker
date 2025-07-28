@@ -25,6 +25,5 @@ public class ExpenseDTO {
     @NotNull(message = "Date is required")
     private LocalDate date;
 
-
-
+    private String categoryName;
 }
