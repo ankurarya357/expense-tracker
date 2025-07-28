@@ -22,6 +22,11 @@ public class CategoryServiceImp implements CategoryService{
      return CategoryMapper.toDTO(category);
     }
 
+    public CategoryDTO getCategoryByName(String name){
+        Category category = categoryRepository.findByName(name).orElseThrow(()->new ResourceNotFoundException(name + " Category not found exception"));
+        return CategoryMapper.toDTO(category);
+    }
+
     public List<CategoryDTO> getAllCategories(){
         List<Category> categories =  categoryRepository.findAll();
         return categories.stream().map(category -> CategoryMapper.toDTO(category)).collect(Collectors.toList());

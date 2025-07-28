@@ -20,9 +20,14 @@ public class CategoryController {
     @Autowired
     private CategoryServiceImp categoryService;
 
-    @GetMapping("/category/{id}")
+    @GetMapping("/category/id/{id}")
     public ResponseEntity<BaseResponse<CategoryDTO>> getCategoryById(@PathVariable Long id){
         return new ResponseEntity<>(new BaseResponse<>(true, id + " Category Data Found",categoryService.getCategoryById(id)), HttpStatus.OK);
+    }
+
+    @GetMapping("/category/name/{name}")
+    public ResponseEntity<BaseResponse<CategoryDTO>> getCategoryByName(@PathVariable String name){
+        return new ResponseEntity<>(new BaseResponse<>(true, name + " Category Data Found",categoryService.getCategoryByName(name)), HttpStatus.OK);
     }
 
     @PostMapping("/category")
@@ -35,13 +40,13 @@ public class CategoryController {
         return new ResponseEntity<>(new BaseResponse<>(true,"All categories fetched",categoryService.getAllCategories()),HttpStatus.OK);
     }
 
-    @DeleteMapping("/category/{id}")
+    @DeleteMapping("/category/id/{id}")
     public ResponseEntity<BaseResponse<CategoryDTO>> deleteCategoryById(@PathVariable Long id){
         categoryService.deleteCategory(id);
         return new ResponseEntity<>(new BaseResponse<>(true, "Category Deleted", null),HttpStatus.OK);
     }
 
-    @PutMapping("/category/{id}")
+    @PutMapping("/category/id/{id}")
     public ResponseEntity<BaseResponse<CategoryDTO>> updateCategory(@PathVariable Long id,@RequestBody Category category){
         return new ResponseEntity<>(new BaseResponse<>(true, "Category Updated", categoryService.updateCategory(id,category)),HttpStatus.OK);
     }
